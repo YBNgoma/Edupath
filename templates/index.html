@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPath:The Career Guidance Chatbot</title>
+    <style>
+      #textInput {
+          border: 2px solid black;
+          border-bottom: 3px solid aqua;
+          background-color: #2c3142;
+      }
+
+      .userText {
+          color: white;
+          font-family: monospace;
+          font-size: 17px;
+          text-align: right;
+          line-height: 30px;
+      }
+      .userText span {
+          background-color: #009688;
+          padding: 10px;
+          border-radius: 10px;
+      }
+      .botText {
+          color: white;
+          font-family: monospace;
+          font-size: 17px;
+          text-align: left;
+          line-height: 30px;
+      }
+      .botText span {
+          background-color: #ae312f;
+          padding: 5px;
+          border-radius: 10px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        background-image: url("static/back.jpg");
+        background-color: #f1f1f1;
+        font-family: "Calibri", "Roboto", sans-serif;
+      }
+      .chat_window {
+        width: 100dvw;
+        max-width: 100%;
+        height: 100dvh;
+        max-height: 100%;
+        border-radius: 5px;
+        background-image: url("static/back.jpg");
+        margin-left: 5%;
+        margin-top: 1%;
+        transform: translateX(-5%) translateY(-5%);
+        overflow: hidden;
+      }
+
+
+
+      .side_menu {
+        width: 100%;
+        height: 10%;
+        box-shadow: 0 1px 30px rgba(0, 0, 0, 0.1);
+        padding-top: 3dvh;
+      }
+      .side_menu .buttons {
+        margin: 3px 0 0 20px;
+        position: absolute;
+      }
+      .side_menu .buttons .button {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 10px;
+        position: relative;
+      }
+      .side_menu .buttons .button.close {
+        background-color: #f5886e;
+      }
+      .side_menu .buttons .button.minimize {
+        background-color: #fdbf68;
+      }
+      .side_menu .buttons .button.maximize {
+        background-color: #a3d063;
+      }
+      .side_menu .title {
+        text-align: center;
+        color: #bcbdc0;
+        font-size: 20px;
+      }
+
+      .messages {
+        position: relative;
+        list-style: none;
+        padding: 20px 10px 0 10px;
+        margin: 0;
+        height: 85%;
+        overflow: scroll;
+      }
+      .messages .message {
+        clear: both;
+        overflow: hidden;
+        margin-bottom: 20px;
+        transition: all 0.5s linear;
+        opacity: 0;
+      }
+      .messages .message.left .avatar {
+        background-color: #f5886e;
+        float: left;
+      }
+      .messages .message.left .text_wrapper {
+        background-color: #000000;
+        margin-left: 20px;
+      }
+      .messages .message.left .text_wrapper::after, .messages .message.left .text_wrapper::before {
+        right: 100%;
+        border-right-color: #0c0701;
+      }
+      .messages .message.left .text {
+        color: #ffffff;
+      }
+      .messages .message.left .avatar {
+        float: left;
+        width: 50px;
+        height: 50px;
+        background-image: url("https://pas-wordpress-media.s3.amazonaws.com/wp-content/uploads/2013/08/Customer-service-woman-on-headset-gives-OK-1024x770.jpg");
+        background-size: cover;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+
+      .messages .message.right .text_wrapper {
+        background-color: #ffffff;
+        margin-right: 20px;
+        float: right;
+      }
+      .messages .message.right .text_wrapper::after, .messages .message.right .text_wrapper::before {
+        left: 100%;
+        border-left-color: #ffffff;
+      }
+      .messages .message.right .text {
+        color: #000000;
+      }
+      .messages .message.appeared {
+        opacity: 1;
+      }
+      .messages .message .avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .messages .message .text_wrapper {
+        display: inline-block;
+        padding: 20px;
+        border-radius: 6px;
+        width: calc(100% - 85px);
+        min-width: 100px;
+        position: relative;
+      }
+      .messages .message .text_wrapper::after, .messages .message .text_wrapper:before {
+        top: 18px;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+      .messages .message .text_wrapper::after {
+        border-width: 13px;
+        margin-top: 0px;
+      }
+      .messages .message .text_wrapper::before {
+        border-width: 15px;
+        margin-top: -2px;
+      }
+      .messages .message .text_wrapper .text {
+        font-size: 18px;
+        font-weight: 300;
+      }
+
+      .bottom_wrapper {
+        position: relative;
+        width: 100%;
+        padding: 20px 20px;
+        bottom: 0;
+      }
+      .bottom_wrapper .message_input_wrapper {
+        display: inline-block;
+        height: 50px;
+        border-radius: 25px;
+        border: 1px solid #bcbdc0;
+        width: calc(85%);
+        position: relative;
+        padding: 0 20px;
+        background-color: 	#2c3142
+      }
+      .bottom_wrapper .message_input_wrapper .message_input {
+        border: none;
+        height: 100%;
+        box-sizing: border-box;
+        width: calc(100% - 40px);
+        position: absolute;
+        outline-width: 0;
+        color: white;
+        background-color: 	#2c3142
+      }
+      .bottom_wrapper .send_message {
+        width: 3%;
+        height: 3%;
+        border-radius: 50px;
+        background-color: #28104E;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.2s linear;
+        text-align: center;
+        float: right;
+      }
+      .bottom_wrapper .send_message:hover {
+        color: #2c3142;
+        background-color: #fff;
+      }
+      .bottom_wrapper .send_message .text {
+        font-size: 18px;
+        font-weight: 300;
+        display: inline-block;
+        line-height: 48px;
+      }
+
+      .bottom_wrapper .voice_message {
+        width: 6%;
+        height: 6%;
+        border-radius: 50px;
+        
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.2s linear;
+        text-align: center;
+        float: right;
+        margin-left: -1%;
+      }
+      
+      .bottom_wrapper .voice_message .text {
+        font-size: 18px;
+        font-weight: 300;
+        display: inline-block;
+        line-height: 48px;
+      }
+
+      .message_template {
+        display: none;
+      }
+
+      .footer #button{
+        width:55px;
+        height:55px;
+        border: #4e919c 12px solid;
+        border-radius:35px;
+        margin:0 auto;
+        position:relative;
+        -webkit-transition: all 1s ease;
+          -moz-transition: all 1s ease;
+          -o-transition: all 1s ease;
+          -ms-transition: all 1s ease;
+          transition: all 1s ease;
+      }
+      .footer #button:hover{
+        width:55px;
+        height:55px;
+        border: #3A3A3A 12px solid;
+        -webkit-transition: all 1s ease;
+          -moz-transition: all 1s ease;
+          -o-transition: all 1s ease;
+          -ms-transition: all 1s ease;
+          transition: all 1s ease;
+        position:relative;
+      }
+      .footer {
+        bottom:0;
+        left:0;
+        position:fixed;
+          width: 100%;
+          height: 2em;
+          overflow:hidden;
+          margin:0 auto;
+        -webkit-transition: all 1s ease;
+          -moz-transition: all 1s ease;
+          -o-transition: all 1s ease;
+          -ms-transition: all 1s ease;
+          transition: all 1s ease;
+        z-index:999;
+      }
+      .footer:hover {
+        -webkit-transition: all 1s ease;
+          -moz-transition: all 1s ease;
+          -o-transition: all 1s ease;
+          -ms-transition: all 1s ease;
+          transition: all 1s ease;
+        height: 10em;
+      }
+      .footer #container{
+        margin-top:5px;
+        width:100%;
+      height:100%;
+        position:relative;
+        top:0;
+        left:0;
+        background: #4e919c;
+      }
+      .footer #cont{
+        position:relative;
+        top:-45px;
+        right:190px;
+        width:150px;
+        height:auto;
+        margin:0 auto;
+      }
+      .footer_center{
+        width:500px;
+        float:left;
+        text-align:center;
+      }
+      .footer h3{
+        font-family: 'Arial';
+        font-size: 20px;
+        font-weight: 100;
+        margin-top:70px;
+        margin-left:10px;
+      }
+    </style>
+    <script src="static/script.js"></script>
+    
+  </head>
+  <body>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <style>
+      body {
+        margin: 0;
+        background-color: #f1f1f1;
+        }
+  
+      .icon-bar {
+        background-color: #2c3142;
+        position: fixed;
+        width: 5%;
+        top: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+      }
+  
+      .icon-bar a {
+        display: flex;
+        align-items: right;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+        color: white;
+        font-size: 24px;
+        text-decoration: none;
+      }
+  
+      .icon-bar .spacer {
+        flex-grow: 1; /* Use flex-grow to make the spacer fill the available space */
+      }
+  
+      .icon-bar .active {
+        background-color: white;
+        border: 2px solid white;
+        width:100%;
+      }
+  
+      .logout-icon {
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+      }
+  
+      .logout-icon:hover {
+        background-color: white;
+        border: 3px solid white;
+        border-radius:40px;
+      }
+  
+      .menu-icon-container {
+        display: none;
+        padding: 20px;
+        height: 92dvh;
+        margin-left: 5%; /* Add this line to set the left margin */
+        box-sizing: border-box; /* Add this line to include padding in the width */
+      }
+      
+      .menu-icon-container.active {
+        display: block;
+      }
+
+      .chat_window {
+        width: 100% ;
+        max-width: 100%;
+        height: 100vh;
+        border-radius: 5px;
+        background-color: 	white;
+        margin-left: 5%;
+        margin-top: 1%;
+        transform: translateX(-5%) translateY(-5%);
+        background-color: 	white;
+        overflow: hidden;
+      }
+    </style>
+  
+    <div class="icon-bar">
+      <a href="#" onclick="openContainer(event, 'chatbot')"><img src="static/bot.ico"alt="Chatbot"></a>
+      <a href="#" onclick="openContainer(event, 'timeline')"><img src="static/path.ico" alt="Timeline"></a>
+      <a href="#" onclick="openContainer(event, 'universities')"><img src="static/graduation-cap.ico" alt="University"></a>
+      <a href="#" onclick="openContainer(event, 'user')"><img src="static/user.ico" alt="User"></a>
+
+      <div class="spacer"></div> <!-- Spacer element -->
+      <div class="logout-icon" onclick="logout()"><img src="static/logout.ico"alt="Chat"></div>
+    </div>
+    
+    <div id="chatbot" class="menu-icon-container">
+      <div id="chat-window-container"></div>
+          
+      <script src="static/script2.js"></script>
+            <script src="static/script.js"></script>
+          
+            <div class="side_menu">
+              <div class="title">Career Guidance Chatbot:</div>
+            </div>
+            <ul class="messages">
+              <li class="message left">
+                <div class="text_wrapper">
+                  <div class="text"></div>
+                </div>
+              </li>
+              <li class="message right">
+                <div class="text_wrapper">
+                  <div class="text"></div>
+                </div>
+              </li>
+            </ul>
+            <div class="bottom_wrapper clearfix">
+              <div class="message_input_wrapper">
+                <script>
+                  window.onload = function() {
+                    var text = "{{ return_text|safe }}";  // Get the recognized text from Flask
+                    var inputField1 = document.getElementById('message_input');
+                    inputField1.value = text;
+                  }
+                  // Run the updateInputField function every second (1000 milliseconds)
+                </script>
+                <input type="text" id="message_input" value="Domo-Arigato" class="message_input" >
+              </div>
+              <div class="send_message">
+                <div class="icon"></div>
+                <div class="text"><img style="height: 30px; width: 30px;margin-bottom: -35%; margin-right: -10%;" src="static/send.png" alt="Send"></div>
+              </div>
+              <div class="voice_message">
+                <script src="/static/recorder.js"></script>
+                <script src="/static/audiodisplay.js"></script>
+                <script src="/static/main.js"></script>
+                <script src="/static/recorderWorker.js"></script>
+                <button id="stop" class="btn btn-danger" onclick="stopRecording(), updateInputField()"><img style="height: 30px; width: 30px;margin-bottom: -7px;" src="static/close.png" alt="Rec"></button>
+              </div>
+              <div class="voice_message">
+                <script src="/static/recorder.js"></script>
+                <script src="/static/audiodisplay.js"></script>
+                <script src="/static/main.js"></script>
+                <script src="/static/recorderWorker.js"></script>
+                <button id="start" class="btn btn-succes" onclick="startRecording()" ><img style="height: 30px; width: 30px;margin-bottom: -7px;" src="static/microphone.png" alt="Rec"></button>
+              </div>
+            </div>
+            <script>
+              function updateInputField() {
+                var text = "{{ return_text|safe }}";  // Get the recognized text from Flask
+                var inputField = document.getElementById('message_input');
+                inputField.value = text;
+              }
+              // Run the updateInputField function every second (1000 milliseconds)
+              
+            </script>
+            <div class="message_template">
+              <li class="message">
+                <div class="text_wrapper">
+                  <div class="text"></div>
+                </div>
+              </li>
+            </div>
+    </div>
+    
+    <div id="timeline" class="menu-icon-container">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
+            background-color: #f1f1f1;
+            font-family: Helvetica, sans-serif;
+          }
+
+          /* The actual timeline (the vertical ruler) */
+          .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+          }
+
+          /* The actual timeline (the vertical ruler) */
+          .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: white;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+          }
+
+          /* Container around content */
+          .container {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+          }
+
+          /* The circles on the timeline */
+          .container::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            right: -17px;
+            background-color: white;
+            border: 4px solid #FF9F55;
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+          }
+
+          /* Place the container to the left */
+          .left {
+            left: 0;
+          }
+
+          /* Place the container to the right */
+          .right {
+            left: 50%;
+          }
+
+          /* Add arrows to the left container (pointing right) */
+          .left::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            right: 30px;
+            border: medium solid white;
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent white;
+          }
+
+          /* Add arrows to the right container (pointing left) */
+          .right::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            left: 30px;
+            border: medium solid white;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent white transparent transparent;
+          }
+
+          /* Fix the circle for containers on the right side */
+          .right::after {
+            left: -16px;
+          }
+
+          /* The actual content */
+          .content {
+            padding: 20px 30px;
+            background-color: white;
+            position: relative;
+            border-radius: 6px;
+          }
+
+          /* Media queries - Responsive timeline on screens less than 600px wide */
+          @media screen and (max-width: 600px) {
+            /* Place the timelime to the left */
+            .timeline::after {
+            left: 31px;
+            }
+            
+            /* Full-width containers */
+            .container {
+            width: 100%;
+            padding-left: 70px;
+            padding-right: 25px;
+            }
+            
+            /* Make sure that all arrows are pointing leftwards */
+            .container::before {
+            left: 60px;
+            border: medium solid white;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent white transparent transparent;
+            }
+
+            /* Make sure all circles are at the same spot */
+            .left::after, .right::after {
+            left: 15px;
+            }
+            
+            /* Make all right containers behave like the left ones */
+            .right {
+            left: 0%;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        
+        <br><br>
+        
+        <form action="/index" method="POST">
+          <label for="dropdown" style="color: white;">Select a Degree :</label>
+          <select name="identifier">
+              <option value="Chem">Bachelor of Science Honours In Applied Chemistry </option>
+              <option value="Bio">BSc (Hons) Degree in Applied Biology & Biochemistry </option>
+              <option value="CompScie">Bachelor Of Science Honours In Computer Science</option>
+              <!-- Add more options for additional identifiers -->
+          </select>
+          <button type="submit">View</button>
+        </form>
+        <br><br>
+
+        <p id="output"></p>
+
+        <script>
+          function submitForm() {
+            var dropdown = document.getElementById("dropdown");
+            var selectedValue = dropdown.value;
+            var output = document.getElementById("output");
+            output.textContent = selectedValue;
+            // You can do further processing with the selected value here
+          }
+        </script>
+        
+        
+        {% if record %}
+        <h1 style="text-align:center; color: white;">{{ record.ProgramName }}</h1>
+        <div class="timeline">
+          <div class="container left">
+            <div class="content">
+              <h1>Part1-<script>document.write( new Date().getFullYear() );</script></h1>
+                <p>{{ record.part1m1 }}</p>
+                <p>{{ record.part1m2 }}</p>
+                <p>{{ record.part1m3 }}</p>
+                <p>{{ record.part1m4 }}</p>
+                <p>{{ record.part1m5 }}</p>
+                <p>{{ record.part1m6 }}</p>
+                <p>{{ record.part1m7 }}</p>
+                <p>{{ record.part1m8 }}</p>
+                <p>{{ record.part1m9 }}</p>
+                <p>{{ record.part1m10 }}</p>
+                <p>{{ record.part1m11 }}</p>
+                <p>{{ record.part1m12 }}</p>
+                <p>{{ record.part1m13 }}</p>
+                <p>{{ record.part1m14 }}</p>
+                <p>{{ record.part1m15 }}</p>
+            </div>
+          </div>
+          <div class="container right">
+            <div class="content">
+              <h1>Part2-<script>document.write( new Date().getFullYear()+1 );</script></h1>
+              <p>{{ record.part2m1 }}</p>
+              <p>{{ record.part2m2 }}</p>
+              <p>{{ record.part2m3 }}</p>
+              <p>{{ record.part2m4 }}</p>
+              <p>{{ record.part2m5 }}</p>
+              <p>{{ record.part2m6 }}</p>
+              <p>{{ record.part2m7 }}</p>
+              <p>{{ record.part2m8 }}</p>
+              <p>{{ record.part2m9 }}</p>
+              <p>{{ record.part2m10 }}</p>
+              <p>{{ record.part2m11 }}</p>
+              <p>{{ record.part2m12 }}</p>
+              <p>{{ record.part2m13 }}</p>
+              <p>{{ record.part2m14 }}</p>
+              <p>{{ record.part2m15 }}</p>
+            </div>
+          </div>
+          <div class="container left">
+            <div class="content">
+              <h1>Part3-<script>document.write( new Date().getFullYear()+2 );</script></h1>
+              
+              <p>{{ record.part3 }}</p>
+            
+            </div>
+          </div>
+          <div class="container right">
+            <div class="content">
+              <h1>Part4-<script>document.write( new Date().getFullYear()+3 );</script></h1>
+              <p>{{ record.part4m1 }}</p>
+              <p>{{ record.part4m2 }}</p>
+              <p>{{ record.part4m3 }}</p>
+              <p>{{ record.part4m4 }}</p>
+              <p>{{ record.part4m5 }}</p>
+              <p>{{ record.part4m6 }}</p>
+              <p>{{ record.part4m7 }}</p>
+              <p>{{ record.part4m8 }}</p>
+              <p>{{ record.part4m9 }}</p>
+              <p>{{ record.part4m10 }}</p>
+              <p>{{ record.part4m11 }}</p>
+              <p>{{ record.part4m12 }}</p>
+              <p>{{ record.part4m13 }}</p>
+              <p>{{ record.part4m14 }}</p>
+              <p>{{ record.part4m15 }}</p>
+            </div>
+          </div> 
+        </div>
+        {% endif %}
+      </body>
+    </div>
+    
+    <div id="universities" class="menu-icon-container">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+        .accordion {
+          background-color: #eee;
+          color: #444;
+          cursor: pointer;
+          padding: 18px;
+          width: 100%;
+          border: none;
+          text-align: left;
+          outline: none;
+          font-size: 15px;
+          transition: 0.4s;
+        }
+        
+        .active, .accordion:hover {
+          background-color: #ccc; 
+        }
+        
+        .panel {
+          padding: 0 18px;
+          display: none;
+          overflow: hidden;
+        }
+        </style>
+      </head>
+      <body>
+        
+        <h2>Universities in Zimbabwe</h2>
+        
+        <button class="accordion"><img style="width: 50px;height: 50px;"src="static/logo_nust_png.png"alt="Chatbot">NATIONAL UNIVERSITY OF SCIENCE AND TECHNOLOGY</button>
+        <div class="panel">
+          <button class="accordion">Contact Details</button>
+          <div class="panel" style="background-color: white;">
+            <p>National University of Science & Technology<br>
+              PO Box AC 939, Ascot, Bulawayo<br>
+              Zimbabwe<br>
+              Tel: +263 292 282842<br>
+              Fax: +263 292 286803</p>
+          </div>
+          <button class="accordion">Department</button>
+          <div class="panel">
+            <button class="accordion">Faculty of Applied Science</button>
+            <div class="panel" style="background-color: white;">
+              <ul>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/110-undergraduate-degree-programmes/applied-sciences-undergrad/345-bachelor-of-science-honours-in-applied-chemistry.html?Itemid=437" target="_blank">BSc (Hons) Degree in Applied Chemistry</a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/110-undergraduate-degree-programmes/applied-sciences-undergrad/338-bsc-hons-degree-in-applied-biology-biochemistry.html?Itemid=437" target="_blank">BSc (Hons) Degree in Applied Biology &amp; Biochemistry</a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/110-undergraduate-degree-programmes/applied-sciences-undergrad/339-2019-06-03-13-30-21.html?Itemid=437" target="_blank">BSc (Hons) Degree in Biotechnology</a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/110-undergraduate-degree-programmes/applied-sciences-undergrad/354-bachelor-of-science-honours-in-applied-physics.html?Itemid=437" target="_blank">BSc (Hons) Degree in Applied Physics</a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/110-undergraduate-degree-programmes/applied-sciences-undergrad/349-bachelor-of-science-honours-degree-in-applied-mathematics.html?Itemid=437"target="_blank">BSc (Hons) Degree in Applied Mathematics</a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/110-undergraduate-degree-programmes/applied-sciences-undergrad/352-bachelor-of-science-honours-degree-in-radiography.html?Itemid=437" target="_blank">BSc (Hons) Degree in Radiography</a></strong></li>
+                <li>
+                <div class="latestnews-date"><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/110-undergraduate-degree-programmes/applied-sciences-undergrad/361-bachelor-of-science-honours-in-computer-science.html?Itemid=437" target="_blank">BSc (Hons) Degree in Computer Science </a></strong></div>
+                </li>
+                <li>
+                <div class="latestnews-date"><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/110-undergraduate-degree-programmes/applied-sciences-undergrad/355-bachelor-of-science-honours-in-earth-sciences.html?Itemid=437" target="_blank">BSc (Hons) Degree in Earth Sciences</a></strong></div>
+                </li>
+                <li>
+                <div class="latestnews-date"><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/110-undergraduate-degree-programmes/applied-sciences-undergrad/365-bachelor-of-science-honours-in-operations-research-and-statistics1.html?Itemid=437" target="_blank">BSc (Hons) in Operations Research and Statistics</a></strong></div>
+                <div class="latestnews-date">&nbsp;</div>
+                </li>
+              </ul>
+            </div>
+            <button class="accordion">Faculty of The Built Environment</button>
+            <div class="panel" style="background-color: white;">
+              <ul>
+                <li><strong><strong><a href="https://www.nust.ac.zw/index.php/component/content/article/111-undergraduate-degree-programmes/built-environment-undergrad/269-bachelor-of-architectural-studies-honours.html?Itemid=437">BSc (Hons) Degree in Architectural Studies</a></strong></strong></li>
+                <li><strong><strong><a href="https://www.nust.ac.zw/index.php/component/content/article/111-undergraduate-degree-programmes/built-environment-undergrad/272-bachelor-of-science-property-development-and-estate-management-honours-bpe-hons-degree.html?Itemid=437">BSc (Hons) Degree in Property Development and Estate Management <br></a></strong></strong></li>
+                <li><strong><a href="https://www.nust.ac.zw/index.php/component/content/article/111-undergraduate-degree-programmes/built-environment-undergrad/271-bachelor-of-quantity-surveying-honours-degree.html?Itemid=437">BSc (Hons) Degree in Quantity Surveying&nbsp;</a></strong>
+                <div>&nbsp;</div>
+                <strong><a href="https://www.nust.ac.zw/index.php/component/content/article/111-undergraduate-degree-programmes/built-environment-undergrad/272-bachelor-of-science-property-development-and-estate-management-honours-bpe-hons-degree.html?Itemid=437"><br></a></strong>
+                </li>
+              </ul>
+            </div>
+            <button class="accordion">Faculty of Communication & Information Science</button>
+            <div class="panel" style="background-color: white;">
+              <div class="sppb-addon-content"><ul>
+                <li><strong><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/113-undergraduate-degree-programmes/comm-info-science-undergrad/280-bachelor-of-science-honours-degree-in-records-and-archives-management.html?Itemid=437">BSc (Hons) Degree in Records and Archives Management</a></strong></strong></li>
+                </ul>
+                <ul>
+                <li><strong><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/113-undergraduate-degree-programmes/comm-info-science-undergrad/276-bachelor-of-science-honours-degree-in-library-and-information-science.html?Itemid=437">BSc (Hons) Degree in Library&nbsp;and Information Science</a></strong></strong></li>
+                </ul>
+                <ul>
+                <li><strong><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/113-undergraduate-degree-programmes/comm-info-science-undergrad/279-bachelor-of-science-honours-degree-in-publishing-media-studies.html?Itemid=437">BSc (Hons) Degree in Publishing&nbsp;Media Studies</a></strong></strong></li>
+                </ul>
+                <ul>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/113-undergraduate-degree-programmes/comm-info-science-undergrad/274-bachelor-of-science-honours-degree-in-journalism-and-media-studies.html?Itemid=437">BSc (Hons) Degree in Journalism and Media Studies</a></strong></li>
+                </ul></div>
+            </div>
+            <button class="accordion">Faculty of Commerce</button>
+            <div class="panel" style="background-color: white;">
+              <ul>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/112-undergraduate-degree-programmes/commerce-undergrad/297-16-0%20bachelor-of-honours-degree-in-actuarial-science.html?Itemid=437">BCom (Hons) Degree in Actuarial Science<br></a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/112-undergraduate-degree-programmes/commerce-undergrad/284-bachelor-of-commerce-honours-degree-in-accounting.html?Itemid=437">BCom (Hons) Degree in Accounting<br></a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/112-undergraduate-degree-programmes/commerce-undergrad/286-bachelor-of-commerce-honours-degree-in-banking-and-investment-management.html?Itemid=437">BCom (Hons) Degree in Banking and Investment Management</a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/112-undergraduate-degree-programmes/commerce-undergrad/291-bachelor-of-commerce-honours-degree-in-finance.html?Itemid=437">BCom (Hons) Degree in Finance<br></a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/112-undergraduate-degree-programmes/commerce-undergrad/292-9%20bachelor-of-commerce-honours-degree-in-fiscal-studies-bcomhfisc.html?Itemid=437">BCom (Hons) Degree in Fiscal Studies&nbsp;<br></a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/112-undergraduate-degree-programmes/commerce-undergrad/288-bachelor-of-commerce-honours-degree-in-management-regulations.html?Itemid=437">BCom (Hons) Degree in Management<br></a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/112-undergraduate-degree-programmes/commerce-undergrad/299-bachelor-of-commerce-honours-degree-in-marketing.html?Itemid=437">BCom (Hons) Degree in Marketing</a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/120-postgraduate-degree-programmes/commerce-postgrad/296-bachelor-of-commmerce-honours-degreein-risk-management-and-insurance.html?Itemid=437">BCom (Hons) Degree in Risk Management and Insurance</a></strong></li>
+                </ul>
+            </div>
+            <button class="accordion">Faculty of Engineering</button>
+            <div class="panel" style="background-color: white;">
+              <ul>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/116-undergraduate-degree-programmes/industrial-technology-undergrad/317-bachelor-of-engineering-honours-degree-in-electronic-engineering-programme.html?Itemid=437">BEng (Hons) Honours Degree In Electronic Engineering</a></strong></li>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/116-undergraduate-degree-programmes/industrial-technology-undergrad/316-bachelor-of-engineering-honours-degree-in-industrial-and-manufacturing-engineering-programme.html?Itemid=437">BEng (Hons) Honours Degree In Industrial And Manufacturing Engineering</a></strong></li>
+                <li><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/116-undergraduate-degree-programmes/industrial-technology-undergrad/321-bachelor-of-engineering-honours-in-civil-and-water-engineering-programme.html?Itemid=437"><strong>BEng (Hons) Honours Degree In Civil and Water Engineering</strong></a></li>
+                <li><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/116-undergraduate-degree-programmes/industrial-technology-undergrad/321-bachelor-of-engineering-honours-in-civil-and-water-engineering-programme.html?Itemid=437"><strong>BEng (Hons) Honours </strong>Degee<strong> in Fibre and Polymer Materials Engineering</strong> </a>
+                <div class="sppb-addon sppb-addon-module ">
+                <div class="sppb-addon-content">&nbsp;</div>
+                </div>
+                </li>
+              </ul>
+            </div>
+            <button class="accordion">Faculty of Science & Technology Education</button>
+            <div class="panel" style="background-color: white;">
+              <div class="sppb-addon-content"><ul>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/114-undergraduate-degree-programmes/industrial-technology-undergrad/science-tech-education-undergrad/308-bachelor-of-design-education-honours-bdesed-hons-degree.html?Itemid=437">BDesEd (Hons) Degree in Art, Design and Technology Education</a></strong></li>
+                </ul>
+                <ul>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/114-undergraduate-degree-programmes/industrial-technology-undergrad/science-tech-education-undergrad/311-bachelor-of-science-education-honours-bsced-hons.html?Itemid=437">BScEd (Hons) Degree in Mathematics and Technology Education</a></strong></li>
+                </ul>
+                <ul>
+                <li><strong><a class="mod-articles-category-title " href="https://www.nust.ac.zw/index.php/component/content/article/114-undergraduate-degree-programmes/industrial-technology-undergrad/science-tech-education-undergrad/312-bachelor-of-technology-education-honours-bteched-hons.html?Itemid=437">BTechEd (Hons) Degree in Technical and Engineering Education</a>&nbsp;</strong></li>
+                </ul></div>
+            </div>
+            
+          </div>
+        </div>
+        
+        <button class="accordion"><img style="width: 50px;height: 50px;"src="static/uz-logo.jpg">UNIVERSITY OF ZIMBABWE</button>
+        <div class="panel"style="background-color: white;">
+          <p>To be Done</p>
+        </div>
+        
+        <button class="accordion"><img style="width: 100px;height: 50px;"src="static/HIT_logo.png">HARARE INSTITUTE OF TECHNOLOGY</button>
+        <div class="panel" style="background-color: white;">
+          <p>To be Done</p>
+        </div>
+        
+        <script>
+        var acc = document.getElementsByClassName("accordion");
+        var i;
+        
+        for (i = 0; i < acc.length; i++) {
+          acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.display === "block") {
+              panel.style.display = "none";
+            } else {
+              panel.style.display = "block";
+            }
+          });
+        }
+        </script>
+        
+      </body>
+    </div>
+    
+    <div id="user" class="menu-icon-container">
+      <head>
+        <style>
+     
+     /* NavbarTop */
+     .navbar-top {
+         background-color: #fff;
+         color: #333;
+         box-shadow: 0px 4px 8px 0px grey;
+         height: 70px;
+         border-radius: 18px;
+     }
+     
+     .utitle {
+         font-family: 'Dancing Script', cursive;
+         position: absolute;
+         left: 45%;
+     }
+     
+     .navbar-top ul {
+         float: right;
+         list-style-type: none;
+         margin: 0;
+         overflow: hidden;
+         padding: 18px 50px 0 40px;
+     }
+     
+     .navbar-top ul li {
+         float: left;
+     }
+     
+     .navbar-top ul li a {
+         color: #333;
+         padding: 14px 16px;
+         text-align: center;
+         text-decoration: none;
+     }
+     
+     .icon-count {
+         background-color: #ff0000;
+         color: #fff;
+         float: right;
+         font-size: 11px;
+         left: -25px;
+         padding: 2px;
+         position: relative;
+     }
+     
+     /* End */
+     
+     /* Sidenav */
+     .sidenav {
+         background-color: #fff;
+         color: #333;
+         border-radius: 10px;
+         height: 86%;
+         left: 0;
+         overflow-x: hidden;
+         padding-top: 20px;
+         position: absolute;
+         top: 70px;
+         width: 25%;
+         margin: 6%;
+         margin-top: 3%;
+        
+     }
+     
+     .profile {
+         margin-bottom: 20px;
+         margin-top: 100px;
+         text-align: center;
+     }
+     
+     .profile img {
+         border-radius: 50%;
+         box-shadow: 0px 0px 5px 1px grey;
+     }
+     
+     .name {
+         font-size: 20px;
+         font-weight: bold;
+         padding-top: 20px;
+     }
+     
+     .job {
+         font-size: 16px;
+         font-weight: bold;
+         padding-top: 10px;
+     }
+     
+     .url, hr {
+         text-align: center;
+     }
+     
+     .url hr {
+         margin-left: 20%;
+         width: 60%;
+     }
+     
+     .url a {
+         color: #818181;
+         display: block;
+         font-size: 20px;
+         margin: 10px 0;
+         padding: 6px 8px;
+         text-decoration: none;
+     }
+     
+     .url a:hover, .url .active {
+         background-color: #e8f5ff;
+         border-radius: 28px;
+         color: #000;
+         margin-left: 14%;
+         width: 65%;
+     }
+     
+     /* End */
+     
+     /* Main */
+     .main {
+         margin-top: 2%;
+         margin-left: 29%;
+         font-size: 28px;
+         padding: 0 10px;
+         width: 58%;
+     }
+     
+     .main h2 {
+         color: white;
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+         font-size: 24px;
+         margin-bottom: 10px;
+     }
+     
+     .main .card {
+         background-color: #fff;
+         border-radius: 18px;
+         box-shadow: 1px 1px 8px 0 grey;
+         height: auto;
+         margin-bottom: 20px;
+         padding: 20px 0 20px 50px;
+     }
+     
+     .main .card table {
+         border: none;
+         font-size: 16px;
+         height: 270px;
+         width: 80%;
+     }
+     
+     .edit {
+         position: absolute;
+         color: #e7e7e8;
+         right: 14%;
+     }
+     
+     /* End */
+        </style>
+     </head>
+     <body>
+         <!-- Navbar top -->
+         <div class="navbar-top">
+             <div class="utitle">
+                 <h1>User Profile</h1>
+             </div>
+     
+             <!-- Navbar -->
+             <ul>
+                 <li>
+                     <a href="#message">
+                         <span class="icon-count">29</span>
+                         <i class="fa fa-envelope fa-2x"></i>
+                     </a>
+                 </li>
+                 <li>
+                     <a href="#notification">
+                         <span class="icon-count">59</span>
+                         <i class="fa fa-bell fa-2x"></i>
+                     </a>
+                 </li>
+                 <li>
+                     <a href="#sign-out">
+                         <i class="fa fa-sign-out-alt fa-2x"></i>
+                     </a>
+                 </li>
+             </ul>
+             <!-- End -->
+         </div>
+         <!-- End -->
+     
+         <!-- Sidenav -->
+         <div class="sidenav">
+             <div class="profile">
+                 <img src="static/bot.png" alt="" width="100" height="100">
+     
+                 <div class="name">
+                     Yassin B Ngoma
+                 </div>
+                 <div class="job">
+                     Web Developer
+                 </div>
+             </div>
+     
+             
+         </div>
+         <!-- End -->
+     
+         <!-- Main -->
+         <div class="main">
+            <h2>IDENTITY</h2>
+            <div class="card">
+                 <div class="card-body">
+                     <i class="fa fa-pen fa-xs edit"></i>
+                     <table>
+                         <tbody>
+                             <tr>
+                                 <td>Name</td>
+                                 <td>:</td>
+                                 <td>ImDezCode</td>
+                             </tr>
+                             <tr>
+                                 <td>Email</td>
+                                 <td>:</td>
+                                 <td>imdezcode@gmail.com</td>
+                             </tr>
+                             <tr>
+                                 <td>Address</td>
+                                 <td>:</td>
+                                 <td>Bali, Indonesia</td>
+                             </tr>
+                             <tr>
+                                 <td>Hobbies</td>
+                                 <td>:</td>
+                                 <td>Diving, Reading Book</td>
+                             </tr>
+                             <tr>
+                                 <td>Job</td>
+                                 <td>:</td>
+                                 <td>Web Developer</td>
+                             </tr>
+                             <tr>
+                                 <td>Skill</td>
+                                 <td>:</td>
+                                 <td>PHP, HTML, CSS, Java</td>
+                             </tr>
+                         </tbody>
+                     </table>
+                 </div>
+            </div>
+     
+            <h2>Chat History</h2>
+            <div class="card">
+              <div class="card-body">
+                <head>
+                  <style>
+                    .hcontainer {
+                        max-width: 800px;
+                        margin: 0 auto;
+                        padding: 20px;
+                        background-color: #ffffff;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        border-radius: 8px;
+                    }
+                    .htitle {
+                        font-size: 28px;
+                        font-weight: bold;
+                        color: #333333;
+                        margin-bottom: 20px;
+                    }
+                    .hfile-list {
+                        list-style-type: none;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .hfile-list li {
+                        margin-bottom: 10px;
+                        margin-right: 5%;
+                        border: 1px solid #e6e6e6;
+                        border-radius: 4px;
+                        padding: 10px;
+                        transition: border-color 0.3s;
+                    }
+                    .hfile-list li:hover {
+                        border-color: #3273dc;
+                    }
+                    .hfile-list li a {
+                        color: #3273dc;
+                        text-decoration: none;
+                        transition: color 0.3s;
+                    }
+                    .hfile-list li a:hover {
+                        color: #1e5aff;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <ul class="hfile-list">
+                      {% for file in files %}
+                        <li><a href="/download/{{ file }}">{{ file }}</a></li>
+                      {% endfor %}
+                  </ul>
+                </body>
+              </div>
+            </div>
+          </div>
+         <script src="static/script2.js"></script>
+         <!-- End -->
+     </body>
+    </div>
+    <script src="static/script2.js"></script>
+  </body>
+</html>
