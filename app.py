@@ -8,9 +8,9 @@ import csv
 import speech_recognition as sr
 from flask import send_from_directory
 
-from langchain.chains import ConversationalRetrievalChain, RetrievalQA
+from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import DirectoryLoader, TextLoader
+from langchain.document_loaders import DirectoryLoader
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.indexes import VectorstoreIndexCreator
 from langchain.indexes.vectorstore import VectorStoreIndexWrapper
@@ -110,7 +110,6 @@ def chat(user_input):
     
     return result
 
-# Python Program that helps translate Speech to Text import speech_recognition # The Recognizer is initialized. UserVoiceRecognizer = speech_recognition.Recognizer() while(1): try: with speech_recognition.Microphone() as UserVoiceInputSource: UserVoiceRecognizer.adjust_for_ambient_noise(UserVoiceInputSource, duration=0.5) # The Program listens to the user voice input. UserVoiceInput = UserVoiceRecognizer.listen(UserVoiceInputSource) UserVoiceInput_converted_to_Text = UserVoiceRecognizer.recognize_google(UserVoiceInput) UserVoiceInput_converted_to_Text = UserVoiceInput_converted_to_Text.lower() print(UserVoiceInput_converted_to_Text) except KeyboardInterrupt: print('A KeyboardInterrupt encountered; Terminating the Program !!!') exit(0) except speech_recognition.UnknownValueError: print("No User Voice detected OR unintelligible noises detected OR the recognized audio cannot be matched to text !!!") 
 @app.route('/download_chat_history/<int:file_number>', methods=['GET'])
 def download_chat_history(file_number):
     # Get the current working directory
